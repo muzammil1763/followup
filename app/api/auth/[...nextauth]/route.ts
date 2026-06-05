@@ -3,6 +3,13 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
+// Auto-detect URL: works on Vercel and localhost
+const getBaseUrl = () => {
+  if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+};
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -30,6 +37,10 @@ const handler = NextAuth({
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
   secret: process.env.NEXTAUTH_SECRET,
+  // Use auto-detected URL
+  ...(process.env.VERCEL_URL && !process.env.NEXTAUTH_URL
+    ? { url: `https://${process.env.VERCEL_URL}` }
+    : {}),
 });
 
 export { handler as GET, handler as POST };
