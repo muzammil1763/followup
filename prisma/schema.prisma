@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum DeliveryStatus {
+  IN_PROCESSING
+  DELIVERED
+  RTO
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+}
+
+model ShipmentRecord {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  refNumber     String         @unique
+  awbNumber     String         @unique
+  courier       String         @default("")
+  country       String
+  customerName  String
+  phone         String
+  city          String
+  areaName      String
+  address       String
+  productName   String
+  sku           String         @default("")
+  codAmount     Float
+  saleAgent     String         @default("")
+  team          String         @default("")
+  status        DeliveryStatus @default(IN_PROCESSING)
+  paymentStatus PaymentStatus? // only relevant when status = DELIVERED
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model FollowupRecord {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  awbNumber            String
+  customerName         String
+  contactNumber        String
+  city                 String
+  country              String   // KSA or UAE
+  updatedAddress       String
+  courierCurrentStatus String
+  createdAt            DateTime @default(now())
+}
