@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Loader2, ArrowRight, Mail } from 'lucide-react';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,11 +15,15 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const res = await signIn('credentials', { email, password, redirect: false });
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
     setLoading(false);
     if (res?.ok) {
       toast.success('Welcome back!');
-      router.push('/admin');
+      window.location.href = '/admin';
     } else {
       toast.error('Invalid email or password');
     }
