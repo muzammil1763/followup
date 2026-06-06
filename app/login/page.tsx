@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Lock, Loader2, ArrowRight, Mail } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,11 +13,7 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+    const res = await signIn('credentials', { email, password, redirect: false });
     setLoading(false);
     if (res?.ok) {
       toast.success('Welcome back!');
@@ -30,79 +24,137 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mesh-bg flex min-h-screen items-center justify-center px-4">
-      {/* Orbs */}
-      <div className="orb h-96 w-96 bg-violet-400/20 top-[-60px] left-[-80px]" />
-      <div className="orb h-80 w-80 bg-blue-400/15 bottom-[-40px] right-[-60px]" style={{ animationDelay: '4s' }} />
-      <div className="orb h-64 w-64 bg-emerald-400/12 top-[40%] right-[10%]" style={{ animationDelay: '2s' }} />
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#f0ede8',
+        fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Watermark */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: '-2%',
+          top: '15%',
+          fontSize: 'clamp(80px, 18vw, 200px)',
+          fontWeight: 900,
+          lineHeight: 0.85,
+          color: 'rgba(0,0,0,0.05)',
+          letterSpacing: '-0.03em',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        Sign
+        <br />
+        In
+      </div>
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <div
-            className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl shadow-2xl"
-            style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
-          >
-            <img src="/logo.png" alt="DeliverTrack" className="h-full w-full object-contain p-3" />
+      {/* Header */}
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid rgba(0,0,0,0.08)', position: 'relative', zIndex: 10, background: '#f0ede8' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="9" y1="13" x2="15" y2="13"/>
+              <line x1="9" y1="17" x2="15" y2="17"/>
+            </svg>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-gray-800">DELIVERTRACK</h1>
-          <p className="mt-1 text-sm text-gray-500 tracking-widest">ADMIN PORTAL</p>
+          <span style={{ fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', color: '#111' }}>FOLLOW UP</span>
         </div>
+        <a href="/" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.14em', color: '#888', textDecoration: 'none' }}>← HOME</a>
+      </header>
 
-        {/* Card */}
-        <div className="glass-strong rounded-3xl p-8 shadow-2xl">
-          <div className="mb-7">
-            <h2 className="text-2xl font-black tracking-tight text-gray-800">Sign In</h2>
-            <p className="mt-1 text-sm text-gray-500">Access the admin dashboard</p>
+      {/* Form */}
+      <main
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          padding: 'clamp(24px, 6vw, 60px) clamp(24px, 10%, 160px)',
+          position: 'relative',
+          zIndex: 10,
+        }}
+      >
+        <div style={{ width: '100%', maxWidth: '400px' }}>
+          <div style={{ marginBottom: '40px' }}>
+            <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: '#aaa', marginBottom: '10px' }}>ADMIN ACCESS</p>
+            <h1 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, letterSpacing: '-0.03em', color: '#111', lineHeight: 1.1, margin: 0 }}>
+              Sign In
+            </h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-gray-500">
-                <Mail className="mr-1.5 inline h-3.5 w-3.5" />Email Address
-              </Label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@delivertrack.com"
-                className="input-glass h-12"
-                required
-              />
-            </div>
+          <form onSubmit={handleSubmit}>
+            <Field label="EMAIL ADDRESS">
+              <LineInput type="email" value={email} onChange={setEmail} placeholder="admin@example.com" />
+            </Field>
+            <Field label="PASSWORD">
+              <LineInput type="password" value={password} onChange={setPassword} placeholder="••••••••" />
+            </Field>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-gray-500">
-                <Lock className="mr-1.5 inline h-3.5 w-3.5" />Password
-              </Label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="input-glass h-12"
-                required
-              />
+            <div style={{ marginTop: '40px' }}>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  backgroundColor: '#111', color: '#fff', border: 'none',
+                  padding: '14px 40px', fontSize: '11px', fontWeight: 700,
+                  letterSpacing: '0.15em', cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.6 : 1, display: 'inline-flex',
+                  alignItems: 'center', gap: '8px', transition: 'opacity 0.2s',
+                }}
+              >
+                {loading ? <><Loader2 style={{ width: 13, height: 13 }} className="animate-spin" />SIGNING IN</> : 'SIGN IN'}
+              </button>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary group mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-semibold uppercase tracking-wider disabled:opacity-50 disabled:transform-none"
-            >
-              {loading ? (
-                <><Loader2 className="h-5 w-5 animate-spin" />Signing In</>
-              ) : (
-                <>Sign In <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></>
-              )}
-            </button>
           </form>
         </div>
+      </main>
 
-        <p className="mt-5 text-center text-xs text-gray-400">
-          Secure admin access · DeliverTrack System
-        </p>
-      </div>
+      {/* Footer */}
+      <footer style={{ padding: '14px 24px', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(0,0,0,0.06)', position: 'relative', zIndex: 10 }}>
+        <span style={{ fontSize: '10px', color: '#bbb', letterSpacing: '0.08em' }}>© {new Date().getFullYear()}</span>
+        <span style={{ fontSize: '10px', color: '#bbb', letterSpacing: '0.08em' }}>FOLLOW UP SYSTEM</span>
+      </footer>
     </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: '28px' }}>
+      <label style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', color: '#888', marginBottom: '8px' }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function LineInput({ value, onChange, placeholder, type = 'text' }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      required
+      style={{
+        display: 'block', width: '100%', background: 'transparent',
+        border: 'none', borderBottom: '1px solid #111', outline: 'none',
+        fontSize: '14px', color: '#111', padding: '4px 0 8px', letterSpacing: '0.02em',
+      }}
+      onFocus={(e) => { e.target.style.borderBottomWidth = '2px'; }}
+      onBlur={(e) => { e.target.style.borderBottomWidth = '1px'; }}
+    />
   );
 }

@@ -12,8 +12,8 @@ export function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  // Hide navbar on admin page
-  if (pathname === '/admin') {
+  // Hide navbar on admin page and home page
+  if (pathname === '/admin' || pathname === '/') {
     return null;
   }
 

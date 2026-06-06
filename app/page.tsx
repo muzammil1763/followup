@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { CheckCircle2, Loader2, ArrowRight, Send, ClipboardList } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -32,6 +30,22 @@ export default function HomePage() {
   const [form, setForm] = useState(emptyFollowup);
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [today, setToday] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const update = () =>
+      setToday(
+        new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()
+      );
+    update();
+    // Refresh at midnight
+    const now = new Date();
+    const msUntilMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+    const timer = setTimeout(() => { update(); }, msUntilMidnight);
+    return () => clearTimeout(timer);
+  }, []);
 
   function handleChange(field: keyof typeof emptyFollowup, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -75,194 +89,319 @@ export default function HomePage() {
   }
 
   return (
-    <div className="mesh-bg min-h-screen flex items-center justify-center px-4 py-12">
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#f0ede8',
+        fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Watermark text */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: '-2%',
+          top: '18%',
+          fontSize: 'clamp(80px, 18vw, 200px)',
+          fontWeight: 900,
+          lineHeight: 0.85,
+          color: 'rgba(0,0,0,0.055)',
+          letterSpacing: '-0.03em',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        Follow
+        <br />
+        Up
+      </div>
 
-      {/* Background orbs */}
-      <div className="orb h-[500px] w-[500px] bg-violet-500/20 top-[-120px] left-[-120px]" />
-      <div className="orb h-[400px] w-[400px] bg-blue-500/15 bottom-[-80px] right-[-80px]" style={{ animationDelay: '3s' }} />
-      <div className="orb h-[300px] w-[300px] bg-emerald-400/15 top-[40%] right-[15%]" style={{ animationDelay: '5s' }} />
-      <div className="orb h-[250px] w-[250px] bg-pink-400/10 bottom-[20%] left-[10%]" style={{ animationDelay: '2s' }} />
-
-      {/* Outer glow wrapper — creates the 3D floating depth */}
-      <div className="relative z-10 w-full max-w-3xl">
-
-        {/* Shadow layer 3 — deepest */}
+      {/* Header */}
+      <header
+        style={{
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          position: 'relative',
+          zIndex: 20,
+          background: '#f0ede8',
+        }}
+      >
         <div
-          className="absolute inset-0 rounded-[2.5rem] opacity-30"
           style={{
-            transform: 'translateY(24px) scale(0.94)',
-            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
-            filter: 'blur(40px)',
-          }}
-        />
-        {/* Shadow layer 2 */}
-        <div
-          className="absolute inset-0 rounded-[2.5rem] opacity-20"
-          style={{
-            transform: 'translateY(14px) scale(0.97)',
-            background: 'linear-gradient(135deg,#818cf8,#a78bfa)',
-            filter: 'blur(24px)',
-          }}
-        />
-        {/* Shadow layer 1 — closest */}
-        <div
-          className="absolute inset-0 rounded-[2.5rem] opacity-40"
-          style={{
-            transform: 'translateY(6px) scale(0.99)',
-            boxShadow: '0 20px 60px rgba(99,102,241,0.25)',
-          }}
-        />
-
-        {/* Main card */}
-        <div
-          className="relative overflow-hidden rounded-[2.5rem]"
-          style={{
-            background: 'rgba(255,255,255,0.72)',
-            backdropFilter: 'blur(40px) saturate(200%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(200%)',
-            border: '1px solid rgba(255,255,255,0.85)',
-            boxShadow: '0 2px 0 rgba(255,255,255,0.9) inset, 0 -1px 0 rgba(0,0,0,0.04) inset, 0 8px 32px rgba(99,102,241,0.10)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '18px 24px',
           }}
         >
-          {/* Top gradient strip */}
-          <div
-            className="h-1.5 w-full"
-            style={{ background: 'linear-gradient(90deg,#6366f1,#8b5cf6,#06b6d4)' }}
-          />
-
-          <div className="px-8 pb-8 pt-7 sm:px-10 sm:pb-10">
-
-            {/* Header */}
-            <div className="mb-7 flex items-center gap-4">
-              <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-lg"
-                style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
-              >
-                <ClipboardList className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-black tracking-tight text-gray-800">Follow-Up Form</h1>
-                <p className="text-xs text-gray-400 tracking-wide">Log a customer follow-up record</p>
-              </div>
+          {/* Brand */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="15" y2="17"/>
+              </svg>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-
-              {/* AWB + Customer */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">AWB #</Label>
-                  <Input
-                    value={form.awbNumber}
-                    onChange={(e) => handleChange('awbNumber', e.target.value)}
-                    placeholder="e.g. AWB-123456"
-                    className="input-glass h-11"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Customer Name</Label>
-                  <Input
-                    value={form.customerName}
-                    onChange={(e) => handleChange('customerName', e.target.value)}
-                    placeholder="Full name"
-                    className="input-glass h-11"
-                  />
-                </div>
-              </div>
-
-              {/* Country + Contact */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Country *</Label>
-                  <Select value={form.country} onValueChange={handleCountryChange}>
-                    <SelectTrigger className="input-glass h-11">
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent className="glass rounded-2xl border-white/70">
-                      <SelectItem value="KSA">🇸🇦 KSA — Saudi Arabia</SelectItem>
-                      <SelectItem value="UAE">🇦🇪 UAE — United Arab Emirates</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Contact #</Label>
-                  <Input
-                    value={form.contactNumber}
-                    onChange={(e) => handleChange('contactNumber', e.target.value)}
-                    placeholder={form.country ? `${COUNTRY_CODES[form.country]} ...` : 'Select country first'}
-                    className="input-glass h-11"
-                  />
-                </div>
-              </div>
-
-              {/* City */}
-              <div className="space-y-1.5">
-                <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">City</Label>
-                <Input
-                  value={form.city}
-                  onChange={(e) => handleChange('city', e.target.value)}
-                  placeholder="e.g. Riyadh, Dubai..."
-                  className="input-glass h-11"
-                />
-              </div>
-
-              {/* Updated Address + Courier Status */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Updated Address</Label>
-                  <Input
-                    value={form.updatedAddress}
-                    onChange={(e) => handleChange('updatedAddress', e.target.value)}
-                    placeholder="Full updated delivery address"
-                    className="input-glass h-11"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Courier Current Status</Label>
-                  <Input
-                    value={form.courierCurrentStatus}
-                    onChange={(e) => handleChange('courierCurrentStatus', e.target.value)}
-                    placeholder="e.g. Out for delivery, Pending pickup..."
-                    className="input-glass h-11"
-                  />
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="pt-1">
-                <div className="h-px w-full" style={{ background: 'linear-gradient(90deg,transparent,rgba(99,102,241,0.15),transparent)' }} />
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="btn-primary group flex h-13 w-full items-center justify-center gap-2.5 rounded-2xl py-3.5 text-sm font-bold uppercase tracking-widest disabled:opacity-50 disabled:transform-none"
-              >
-                {submitting ? (
-                  <><Loader2 className="h-4.5 w-4.5 animate-spin" style={{width:'18px',height:'18px'}} />Saving…</>
-                ) : (
-                  <>
-                    <Send style={{width:'16px',height:'16px'}} />
-                    Submit Follow-Up
-                    <ArrowRight style={{width:'16px',height:'16px'}} className="transition-transform group-hover:translate-x-1" />
-                  </>
-                )}
-              </button>
-
-              {/* Success */}
-              {submitSuccess && (
-                <div className="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-emerald-50/80 px-4 py-3.5 backdrop-blur-sm">
-                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                  <p className="text-sm font-medium text-emerald-700">
-                    Record saved! View it in the admin dashboard.
-                  </p>
-                </div>
-              )}
-            </form>
+            <span style={{ fontWeight: 800, fontSize: '13px', letterSpacing: '0.06em', color: '#111', whiteSpace: 'nowrap' }}>
+              FOLLOW UP
+            </span>
           </div>
+
+          {/* Desktop nav — hidden on mobile via Tailwind */}
+          <nav className="hidden sm:flex" style={{ alignItems: 'center', gap: '32px' }}>
+            <a href="/" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', color: '#111', textDecoration: 'none', borderBottom: '1px solid #111', paddingBottom: '1px' }}>HOME</a>
+            <a href="/admin" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.14em', color: '#888', textDecoration: 'none' }}>DASHBOARD</a>
+            <div style={{ width: '1px', height: '14px', background: 'rgba(0,0,0,0.15)' }} />
+            <span style={{ fontSize: '10px', color: '#aaa', letterSpacing: '0.08em' }}>{today}</span>
+          </nav>
+
+          {/* Mobile hamburger — hidden on desktop */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            className="flex sm:hidden"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', flexDirection: 'column', gap: '5px', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Toggle menu"
+          >
+            <span style={{ display: 'block', width: '20px', height: '1.5px', background: '#111', transition: 'all 0.2s', transform: menuOpen ? 'rotate(45deg) translateY(6.5px)' : 'none' }} />
+            <span style={{ display: 'block', width: '20px', height: '1.5px', background: '#111', transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', width: '20px', height: '1.5px', background: '#111', transition: 'all 0.2s', transform: menuOpen ? 'rotate(-45deg) translateY(-6.5px)' : 'none' }} />
+          </button>
         </div>
-      </div>
+
+        {/* Mobile dropdown */}
+        {menuOpen && (
+          <div className="flex sm:hidden" style={{ flexDirection: 'column', borderTop: '1px solid rgba(0,0,0,0.06)', background: '#f0ede8' }}>
+            <a href="/" style={{ display: 'block', fontSize: '11px', fontWeight: 700, letterSpacing: '0.14em', color: '#111', textDecoration: 'none', padding: '14px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>HOME</a>
+            <a href="/admin" style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.14em', color: '#555', textDecoration: 'none', padding: '14px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>DASHBOARD</a>
+            <p style={{ padding: '10px 24px 14px', fontSize: '10px', color: '#bbb', letterSpacing: '0.08em', margin: 0 }}>{today}</p>
+          </div>
+        )}
+      </header>
+
+      {/* Form area */}
+      <main
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          maxWidth: '640px',
+          marginLeft: 'auto',
+          marginRight: 'clamp(24px, 10%, 160px)',
+          padding: 'clamp(24px, 5vw, 48px)',
+          paddingBottom: '80px',
+        }}
+      >
+        <form onSubmit={handleSubmit}>
+          {/* AWB */}
+          <Field label="AWB #">
+            <LineInput
+              value={form.awbNumber}
+              onChange={(v) => handleChange('awbNumber', v)}
+              placeholder="AWB-123456"
+            />
+          </Field>
+
+          {/* Customer Name */}
+          <Field label="CUSTOMER NAME">
+            <LineInput
+              value={form.customerName}
+              onChange={(v) => handleChange('customerName', v)}
+              placeholder="Full name"
+            />
+          </Field>
+
+          {/* Country */}
+          <Field label="COUNTRY">
+            <div style={{ borderBottom: '1px solid #111', paddingBottom: '6px' }}>
+              <Select value={form.country} onValueChange={handleCountryChange}>
+                <SelectTrigger
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '0',
+                    height: 'auto',
+                    fontSize: '14px',
+                    color: form.country ? '#111' : '#aaa',
+                    boxShadow: 'none',
+                    outline: 'none',
+                  }}
+                >
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="KSA">🇸🇦 KSA — Saudi Arabia</SelectItem>
+                  <SelectItem value="UAE">🇦🇪 UAE — United Arab Emirates</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </Field>
+
+          {/* Contact */}
+          <Field label="CONTACT #">
+            <LineInput
+              value={form.contactNumber}
+              onChange={(v) => handleChange('contactNumber', v)}
+              placeholder={form.country ? `${COUNTRY_CODES[form.country]}...` : 'Select country first'}
+            />
+          </Field>
+
+          {/* City */}
+          <Field label="CITY">
+            <LineInput
+              value={form.city}
+              onChange={(v) => handleChange('city', v)}
+              placeholder="Riyadh / Dubai"
+            />
+          </Field>
+
+          {/* Updated Address */}
+          <Field label="UPDATED ADDRESS">
+            <LineInput
+              value={form.updatedAddress}
+              onChange={(v) => handleChange('updatedAddress', v)}
+              placeholder="Full delivery address"
+            />
+          </Field>
+
+          {/* Courier Status */}
+          <Field label="COURIER STATUS">
+            <LineInput
+              value={form.courierCurrentStatus}
+              onChange={(v) => handleChange('courierCurrentStatus', v)}
+              placeholder="e.g. Out for delivery"
+            />
+          </Field>
+
+          {/* Submit */}
+          <div style={{ marginTop: '36px' }}>
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                backgroundColor: '#111',
+                color: '#fff',
+                border: 'none',
+                padding: '14px 40px',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                cursor: submitting ? 'not-allowed' : 'pointer',
+                opacity: submitting ? 0.6 : 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'opacity 0.2s',
+              }}
+            >
+              {submitting ? (
+                <><Loader2 style={{ width: 14, height: 14, animation: 'spin 1s linear infinite' }} />SENDING</>
+              ) : (
+                'SUBMIT'
+              )}
+            </button>
+          </div>
+
+          {/* Success */}
+          {submitSuccess && (
+            <div
+              style={{
+                marginTop: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '13px',
+                color: '#3a7d44',
+              }}
+            >
+              <CheckCircle2 style={{ width: 16, height: 16 }} />
+              Record saved successfully.
+            </div>
+          )}
+        </form>
+      </main>
+
+      {/* Bottom bar */}
+      <footer
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '16px 48px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          zIndex: 10,
+        }}
+      >
+        <span style={{ fontSize: '10px', color: '#aaa', letterSpacing: '0.08em' }}>
+          {new Date().getFullYear()}
+        </span>
+        <span style={{ fontSize: '10px', color: '#aaa', letterSpacing: '0.08em' }}>
+          FOLLOW UP SYSTEM
+        </span>
+      </footer>
     </div>
+  );
+}
+
+/* ── Sub-components ─────────────────────────────────────────── */
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: '28px' }}>
+      <label
+        style={{
+          display: 'block',
+          fontSize: '10px',
+          fontWeight: 700,
+          letterSpacing: '0.14em',
+          color: '#888',
+          marginBottom: '8px',
+        }}
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function LineInput({
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={{
+        display: 'block',
+        width: '100%',
+        background: 'transparent',
+        border: 'none',
+        borderBottom: '1px solid #111',
+        outline: 'none',
+        fontSize: '14px',
+        color: '#111',
+        padding: '4px 0 8px',
+        letterSpacing: '0.02em',
+      }}
+      onFocus={(e) => { e.target.style.borderBottomColor = '#000'; e.target.style.borderBottomWidth = '2px'; }}
+      onBlur={(e) => { e.target.style.borderBottomColor = '#111'; e.target.style.borderBottomWidth = '1px'; }}
+    />
   );
 }
