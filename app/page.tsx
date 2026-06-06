@@ -68,7 +68,24 @@ export default function HomePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.country) { toast.error('Please select a country'); return; }
+
+    // Validate all fields
+    const required: { key: keyof typeof emptyFollowup; label: string }[] = [
+      { key: 'awbNumber',           label: 'AWB #' },
+      { key: 'customerName',        label: 'Customer Name' },
+      { key: 'country',             label: 'Country' },
+      { key: 'contactNumber',       label: 'Contact #' },
+      { key: 'city',                label: 'City' },
+      { key: 'updatedAddress',      label: 'Updated Address' },
+      { key: 'courierCurrentStatus',label: 'Courier Status' },
+    ];
+    for (const { key, label } of required) {
+      if (!form[key].trim()) {
+        toast.error(`${label} is required`);
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       const res = await fetch('/api/followup', {
@@ -197,39 +214,20 @@ export default function HomePage() {
       >
         <form onSubmit={handleSubmit}>
           {/* AWB */}
-          <Field label="AWB #">
-            <LineInput
-              value={form.awbNumber}
-              onChange={(v) => handleChange('awbNumber', v)}
-              placeholder="AWB-123456"
-            />
+          <Field label="AWB # *">
+            <LineInput required value={form.awbNumber} onChange={(v) => handleChange('awbNumber', v)} placeholder="AWB-123456" />
           </Field>
 
           {/* Customer Name */}
-          <Field label="CUSTOMER NAME">
-            <LineInput
-              value={form.customerName}
-              onChange={(v) => handleChange('customerName', v)}
-              placeholder="Full name"
-            />
+          <Field label="CUSTOMER NAME *">
+            <LineInput required value={form.customerName} onChange={(v) => handleChange('customerName', v)} placeholder="Full name" />
           </Field>
 
           {/* Country */}
-          <Field label="COUNTRY">
-            <div style={{ borderBottom: '1px solid #111', paddingBottom: '6px' }}>
-              <Select value={form.country} onValueChange={handleCountryChange}>
-                <SelectTrigger
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    padding: '0',
-                    height: 'auto',
-                    fontSize: '14px',
-                    color: form.country ? '#111' : '#aaa',
-                    boxShadow: 'none',
-                    outline: 'none',
-                  }}
-                >
+          <Field label="COUNTRY *">
+            <div style={{ borderBottom: `1px solid ${!form.country ? '#c00' : '#111'}`, paddingBottom: '6px' }}>
+              <Select value={form.country} onValueChange={handleCountryChange} required>
+                <SelectTrigger style={{ border: 'none', background: 'transparent', padding: '0', height: 'auto', fontSize: '14px', color: form.country ? '#111' : '#aaa', boxShadow: 'none', outline: 'none' }}>
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
                 <SelectContent>
@@ -241,39 +239,23 @@ export default function HomePage() {
           </Field>
 
           {/* Contact */}
-          <Field label="CONTACT #">
-            <LineInput
-              value={form.contactNumber}
-              onChange={(v) => handleChange('contactNumber', v)}
-              placeholder={form.country ? `${COUNTRY_CODES[form.country]}...` : 'Select country first'}
-            />
+          <Field label="CONTACT # *">
+            <LineInput required value={form.contactNumber} onChange={(v) => handleChange('contactNumber', v)} placeholder={form.country ? `${COUNTRY_CODES[form.country]}...` : 'Select country first'} />
           </Field>
 
           {/* City */}
-          <Field label="CITY">
-            <LineInput
-              value={form.city}
-              onChange={(v) => handleChange('city', v)}
-              placeholder="Riyadh / Dubai"
-            />
+          <Field label="CITY *">
+            <LineInput required value={form.city} onChange={(v) => handleChange('city', v)} placeholder="Riyadh / Dubai" />
           </Field>
 
           {/* Updated Address */}
-          <Field label="UPDATED ADDRESS">
-            <LineInput
-              value={form.updatedAddress}
-              onChange={(v) => handleChange('updatedAddress', v)}
-              placeholder="Full delivery address"
-            />
+          <Field label="UPDATED ADDRESS *">
+            <LineInput required value={form.updatedAddress} onChange={(v) => handleChange('updatedAddress', v)} placeholder="Full delivery address" />
           </Field>
 
           {/* Courier Status */}
-          <Field label="COURIER STATUS">
-            <LineInput
-              value={form.courierCurrentStatus}
-              onChange={(v) => handleChange('courierCurrentStatus', v)}
-              placeholder="e.g. Out for delivery"
-            />
+          <Field label="COURIER STATUS *">
+            <LineInput required value={form.courierCurrentStatus} onChange={(v) => handleChange('courierCurrentStatus', v)} placeholder="e.g. Out for delivery" />
           </Field>
 
           {/* Submit */}
@@ -376,11 +358,13 @@ function LineInput({
   onChange,
   placeholder,
   type = 'text',
+  required = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   type?: string;
+  required?: boolean;
 }) {
   return (
     <input
@@ -388,6 +372,7 @@ function LineInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
+      required={required}
       style={{
         display: 'block',
         width: '100%',

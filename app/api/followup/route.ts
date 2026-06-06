@@ -15,15 +15,24 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    // Validate all required fields
+    const required = ['awbNumber', 'customerName', 'contactNumber', 'city', 'country', 'updatedAddress', 'courierCurrentStatus'];
+    for (const field of required) {
+      if (!body[field] || !String(body[field]).trim()) {
+        return NextResponse.json({ error: `${field} is required` }, { status: 400 });
+      }
+    }
+
     const record = await prisma.followupRecord.create({
       data: {
-        awbNumber: body.awbNumber ?? '',
-        customerName: body.customerName ?? '',
-        contactNumber: body.contactNumber ?? '',
-        city: body.city ?? '',
-        country: body.country ?? '',
-        updatedAddress: body.updatedAddress ?? '',
-        courierCurrentStatus: body.courierCurrentStatus ?? '',
+        awbNumber:            body.awbNumber.trim(),
+        customerName:         body.customerName.trim(),
+        contactNumber:        body.contactNumber.trim(),
+        city:                 body.city.trim(),
+        country:              body.country.trim(),
+        updatedAddress:       body.updatedAddress.trim(),
+        courierCurrentStatus: body.courierCurrentStatus.trim(),
       },
     });
     return NextResponse.json({ success: true, record });
